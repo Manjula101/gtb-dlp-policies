@@ -1,0 +1,32 @@
+# GTB DLP Policy: USB Data Blocking
+# Blocks or monitors data transfers via USB devices
+# Author: Manjula Wickramasuriya
+
+policy_name: "USB Data Blocking"
+description: "Blocks or audits data transfers via USB storage devices"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "usb_connection"
+    condition: "device_type == 'storage'"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "USB storage device blocked by DLP policy"
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@contoso.com"]
+
+# Scope
+scope:
+  - direction: ["outbound"]
+  - channels: ["usb"]
+
+# Exceptions (optional - allow specific users or devices)
+exceptions:
+  - name: "Approved IT Team"
+    condition: "user.group == 'it_admin' AND device.serial == 'approved-serial-list'"
