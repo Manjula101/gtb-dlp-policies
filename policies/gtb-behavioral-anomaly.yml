@@ -1,0 +1,39 @@
+# GTB DLP Policy: Behavioral Anomaly Detection
+# Detects unusual user behavior like rapid data transfers or unexpected locations
+# Author: Manjula Wickramasuriya
+
+policy_name: "Behavioral Anomaly Detection"
+description: "Monitors and blocks anomalous user behavior to prevent insider threats"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "behavioral"
+    conditions:
+      - name: "Rapid Data Transfer"
+        threshold: "10 transfers per minute"
+        action: "block"
+
+      - name: "Unexpected Location"
+        regex: "country != 'LK' AND country != 'US'"
+        action: "block"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "Behavioral anomaly detected. Activity blocked."
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@gttb.com"]
+
+# Scope
+scope:
+  - direction: ["outbound"]
+  - channels: ["email", "web", "usb", "cloud_storage"]
+
+# Exceptions (optional)
+exceptions:
+  - name: "Approved Security Team"
+    condition: "user.group == 'security'"
