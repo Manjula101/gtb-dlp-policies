@@ -2,20 +2,20 @@
 
 Open-source repository for **GTB (gttb.com)** Data Loss Prevention policies, automation scripts, and integration examples.
 
-Created and maintained by Manjula Wickramasuriya.
+Created and maintained by Manjula Wickramasuriya as a personal open-source contribution to the cybersecurity community.
 
 ---
 
 ### What is GTB?
-GTB is a modern behavioral Data Loss Prevention and Insider Threat solution that protects sensitive data using real-time analytics and zero-trust principles.
+GTB is a modern behavioral Data Loss Prevention and Insider Threat solution that protects sensitive data using real-time analytics, zero-trust principles, and intelligent policy enforcement.
 
 ### Repository Contents
-- Ready-to-use GTB DLP policies
-- Automation and integration scripts
-- Real-world configuration examples
+- Ready-to-use GTB policy examples
+- Automation scripts (Python, Bash)
+- Integration examples with other security tools
 
 ### Policies Included
-- `gtb-sensitive-data-detection.yml` → Detects and blocks credit cards, SSNs, passwords, API keys, etc.
+- [/policies/gtb-sensitive-data-detection.yml](/policies/gtb-sensitive-data-detection.yml) → Detects and blocks credit cards, SSNs, passwords, API keys, etc.
 
 ### Quick Start
 ```bash
