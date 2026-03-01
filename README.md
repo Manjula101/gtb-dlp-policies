@@ -16,8 +16,15 @@ GTB is a modern behavioral Data Loss Prevention and Insider Threat solution that
 
 ### Policies Included
 - [/policies/gtb-sensitive-data-detection.yml](/policies/gtb-sensitive-data-detection.yml) → Detects and blocks credit cards, SSNs, passwords, API keys, etc.
+- [/policies/gtb-usb-blocking.yml](/policies/gtb-usb-blocking.yml) → Blocks or audits USB data transfers.
+- [/policies/gtb-behavioral-anomaly.yml](/policies/gtb-behavioral-anomaly.yml) → Detects unusual user behavior for insider threat prevention.
+
+### Scripts Included
+- [/scripts/apply-dlp-policy.py](/scripts/apply-dlp-policy.py) → Python script to load and validate GTB DLP YAML policies.
 
 ### Quick Start
 ```bash
 git clone https://github.com/Manjula101/gtb-dlp-policies.git
 cd gtb-dlp-policies
+# Example: Validate a policy
+python scripts/apply-dlp-policy.py policies/gtb-sensitive-data-detection.yml
