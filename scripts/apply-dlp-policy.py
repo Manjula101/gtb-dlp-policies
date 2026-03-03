@@ -1,30 +1,25 @@
-#!/usr/bin/env python3
-"""
-GTB DLP Policy Appliers
-Automation script to load and validate GTB DLP YAML policies
-Author: Manjula Wickramasuriya
-"""
+#!/bin/bash
+# GTB DLP Policy Appliers
+# Automation script to load and validate GTB DLP YAML policies
+# Author: Manjula Wickramasuriya
 
-import yaml
-import sys
+if [ $# -ne 1 ]; then
+    echo "Usage: bash apply-dlp-policy.sh <path_to_yaml_policy>"
+    exit 1
+fi
 
-def load_policy(file_path):
-    """Load and validate a GTB DLP YAML policy"""
-    try:
-        with open(file_path, 'r') as f:
-            policy = yaml.safe_load(f)
-        # Simple validation
-        if 'policy_name' not in policy or 'description' not in policy:
-            raise ValueError("Invalid policy: missing policy_name or description")
-        print("Policy loaded successfully:")
-        print(f"Name: {policy['policy_name']}")
-        print(f"Description: {policy['description']}")
-        print("Policy is valid.")
-    except Exception as e:
-        print(f"Error loading policy: {e}")
+file_path=$1
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python apply-dlp-policy.py <path_to_yaml_policy>")
-        sys.exit(1)
-    load_policy(sys.argv[1])
+# Simple validation using yq (assume yq is installed)
+policy_name=$(yq e '.policy_name' "$file_path")
+description=$(yq e '.description' "$file_path")
+
+if [ -z "$policy_name" ] || [ -z "$description" ]; then
+    echo "Invalid policy: missing policy_name or description"
+    exit 1
+fi
+
+echo "Policy loaded successfully:"
+echo "Name: $policy_name"
+echo "Description: $description"
+echo "Policy is valid."
