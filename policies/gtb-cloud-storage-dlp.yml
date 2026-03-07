@@ -1,0 +1,54 @@
+# GTB DLP Policy: Cloud Storage Data Loss Prevention
+# Blocks sensitive data uploads to public cloud storage (Dropbox, OneDrive, Google Drive, etc.)
+# Author: Manjula Wickramasuriya
+
+policy_name: "Cloud Storage DLP"
+description: "Detects and blocks sensitive data uploads to public cloud storage services"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "cloud_upload"
+    conditions:
+      - name: "Sensitive Data Scan"
+        patterns:
+          - name: "Credit Card"
+            regex: "(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})"
+            action: "block"
+          - name: "SSN"
+            regex: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+            action: "block"
+          - name: "Password"
+            regex: "(?i)(password|pwd|pass)\\s*[=:]\\s*\\S+"
+            action: "block"
+          - name: "API Key"
+            regex: "(?i)(api_key|apikey|secret_key)\\s*[=:]\\s*[A-Za-z0-9_-]{20,}"
+            action: "block"
+
+      - name: "Destination Check"
+        destinations:
+          - "dropbox.com"
+          - "onedrive.live.com"
+          - "drive.google.com"
+          - "icloud.com"
+        action: "block"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "Cloud storage upload blocked: sensitive data detected"
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@gttb.com"]
+
+# Scope
+scope:
+  - direction: ["outbound"]
+  - channels: ["cloud_storage"]
+
+# Exceptions (optional)
+exceptions:
+  - name: "Approved Cloud Accounts"
+    condition: "destination == 'company-approved-drive' OR user.group == 'it_admin'"
