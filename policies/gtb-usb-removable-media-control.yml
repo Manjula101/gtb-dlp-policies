@@ -1,0 +1,43 @@
+# GTB DLP Policy: USB Removable Media Control
+# Advanced control for USB devices - requires encryption, blocks large transfers, limits to authorized devices
+# Author: Manjula Wickramasuriya
+
+policy_name: "USB Removable Media Control"
+description: "Enforces encryption on USB devices, blocks large transfers, and restricts to authorized hardware"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "usb_connection"
+    conditions:
+      - name: "Encryption Check"
+        required: true
+        action: "block_if_missing"
+
+      - name: "Large Transfer"
+        threshold: "500 MB"
+        action: "block"
+
+      - name: "Unauthorized Device"
+        allowed_serials: ["approved-serial-001", "approved-serial-002"]
+        action: "block"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "USB device blocked: encryption missing, large transfer, or unauthorized device"
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@gttb.com"]
+
+# Scope
+scope:
+  - direction: ["outbound"]
+  - channels: ["usb"]
+
+# Exceptions (optional)
+exceptions:
+  - name: "IT Admin Team"
+    condition: "user.group == 'it_admin'"
