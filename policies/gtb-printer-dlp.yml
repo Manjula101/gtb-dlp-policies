@@ -1,0 +1,48 @@
+# GTB DLP Policy: Printer Data Loss Prevention
+# Scans print jobs for sensitive data and blocks or watermarks
+# Author: Manjula Wickramasuriya
+
+policy_name: "Printer DLP"
+description: "Scans print jobs for sensitive data (PII, financial info, credentials) and blocks or watermarks"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "print_job"
+    conditions:
+      - name: "Sensitive Data Scan"
+        patterns:
+          - name: "Credit Card"
+            regex: "(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})"
+            action: "block"
+          - name: "SSN"
+            regex: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+            action: "block"
+          - name: "Password"
+            regex: "(?i)(password|pwd|pass)\\s*[=:]\\s*\\S+"
+            action: "block"
+          - name: "API Key"
+            regex: "(?i)(api_key|apikey|secret_key)\\s*[=:]\\s*[A-Za-z0-9_-]{20,}"
+            action: "block"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "Print job blocked: sensitive data detected"
+  - type: "watermark"
+    text: "CONFIDENTIAL - GTB DLP"
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@gttb.com"]
+
+# Scope
+scope:
+  - direction: ["outbound"]
+  - channels: ["printer"]
+
+# Exceptions (optional)
+exceptions:
+  - name: "Finance Department"
+    condition: "user.group == 'finance'"
