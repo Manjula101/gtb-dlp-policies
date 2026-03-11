@@ -1,0 +1,39 @@
+# GTB DLP Policy: Removable Media Encryption Enforcement
+# Enforces encryption on USB/removable media devices and blocks unencrypted devices
+# Author: Manjula Wickramasuriya
+
+policy_name: "Removable Media Encryption Enforcement"
+description: "Requires encryption on all removable media devices and blocks unencrypted USB drives"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "usb_connection"
+    conditions:
+      - name: "Encryption Check"
+        required: true
+        action: "block_if_missing"
+
+      - name: "Large Unencrypted Transfer"
+        threshold: "100 MB"
+        action: "block"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "Removable media blocked: encryption required"
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@gttb.com"]
+
+# Scope
+scope:
+  - direction: ["outbound"]
+  - channels: ["usb"]
+
+# Exceptions (optional)
+exceptions:
+  - name: "Approved IT Team"
+    condition: "user.group == 'it_admin'"
