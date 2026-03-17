@@ -1,0 +1,54 @@
+# GTB DLP Policy: Network Data Loss Prevention
+# Scans and blocks sensitive data transmitted over network protocols (SMB, FTP, HTTP uploads, etc.)
+# Author: Manjula Wickramasuriya
+
+policy_name: "Network DLP"
+description: "Detects and blocks sensitive data sent over network shares, FTP, HTTP uploads, and other protocols"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "network_transfer"
+    conditions:
+      - name: "Sensitive Data Scan"
+        patterns:
+          - name: "Credit Card"
+            regex: "(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})"
+            action: "block"
+          - name: "SSN"
+            regex: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+            action: "block"
+          - name: "Password"
+            regex: "(?i)(password|pwd|pass)\\s*[=:]\\s*\\S+"
+            action: "block"
+          - name: "API Key"
+            regex: "(?i)(api_key|apikey|secret_key)\\s*[=:]\\s*[A-Za-z0-9_-]{20,}"
+            action: "block"
+
+      - name: "Protocol Check"
+        protocols:
+          - "SMB"
+          - "FTP"
+          - "HTTP"
+          - "HTTPS"
+        action: "scan"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "Network transfer blocked: sensitive data detected"
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@gttb.com"]
+
+# Scope
+scope:
+  - direction: ["outbound", "internal"]
+  - channels: ["network", "file_share", "ftp", "http_upload"]
+
+# Exceptions (optional)
+exceptions:
+  - name: "Approved Internal Shares"
+    condition: "destination == 'company.internal.share' OR user.group == 'it_admin'"
