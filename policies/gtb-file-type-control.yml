@@ -1,0 +1,43 @@
+# GTB DLP Policy: File Type Control
+# Blocks high-risk file extensions (.exe, .bat, .js, .ps1, etc.) on USB, network shares, and cloud uploads
+# Author: Manjula Wickramasuriya
+
+policy_name: "File Type Control"
+description: "Blocks dangerous file types to prevent malware execution and data exfiltration"
+severity: "High"
+enabled: true
+
+# Trigger conditions
+triggers:
+  - type: "file_transfer"
+    conditions:
+      - name: "Risky Extensions"
+        extensions:
+          - ".exe"
+          - ".bat"
+          - ".cmd"
+          - ".js"
+          - ".vbs"
+          - ".ps1"
+          - ".scr"
+          - ".pif"
+        action: "block"
+
+# Actions when triggered
+actions:
+  - type: "block"
+    message: "File transfer blocked: risky file type detected"
+  - type: "log"
+    level: "high"
+  - type: "notify"
+    recipients: ["security-team@gttb.com"]
+
+# Scope
+scope:
+  - direction: ["outbound", "internal"]
+  - channels: ["usb", "network", "cloud_storage", "email_attachment"]
+
+# Exceptions (optional)
+exceptions:
+  - name: "IT Security Team"
+    condition: "user.group == 'security' OR user.group == 'it_admin'"
